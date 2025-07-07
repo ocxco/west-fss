@@ -1,6 +1,6 @@
 <?php
 
-namespace Exceptions;
+namespace Chasel\WestFss\Exceptions;
 
 class FSSClientException extends \Exception
 {

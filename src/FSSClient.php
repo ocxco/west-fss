@@ -1,7 +1,8 @@
 <?php
 
+namespace Chasel\WestFss;
 
-use Exceptions\FSSRequestException;
+use Chasel\WestFss\Exceptions\FSSRequestException;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\RequestException;
 
@@ -64,14 +65,6 @@ class FSSClient
         return $this;
     }
 
-    private function generateSignature(array $params): string
-    {
-        $timestamp = time();
-        $contentHash = hash('sha1', json_encode($options['body'] ?? ''));
-        $stringToSign = $method . $path . $timestamp . $this->accessKey . $contentHash;
-        return base64_encode(hash_hmac('sha256', $stringToSign, $this->secretKey, true));
-    }
-
     /**
      * 发起 HTTP 请求到 FSS 服务
      *
@@ -79,7 +72,7 @@ class FSSClient
      * @param string $path 请求路径
      * @param array $options 请求选项
      * @return array 响应数据
-     * @throws FSSRequestException
+     * @throws FSSRequestException|\GuzzleHttp\Exception\GuzzleException
      */
     private function makeRequest(string $method, string $path, array $options = [])
     {

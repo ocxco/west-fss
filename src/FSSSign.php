@@ -1,5 +1,7 @@
 <?php
 
+namespace Chasel\WestFss;
+
 class FSSSign
 {
     public static function signRestApi(array $params): string
