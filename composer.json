@@ -1,0 +1,20 @@
+{
+    "name": "chasel/west-fss",
+    "description": "西部数码FSS API",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Chasel\\WestFss\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "xuechaoc",
+            "email": "xuechaoc0211@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
