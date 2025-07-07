@@ -15,7 +15,6 @@ class FSSSign
             $signStr .= "&{$params['Content-MD5']}";
         }
         $sign = base64_encode(hash_hmac('sha1', $signStr, $params['Password'], true));
-        var_dump($signStr, $params['Password'], $sign);
         return sprintf("%s %s:%s", 'WESTYUN', $params['Operator'], $sign);
     }
 }
