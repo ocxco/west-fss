@@ -109,10 +109,10 @@ class FSSClient
      * @return array 存储桶列表数据
      * @throws FSSRequestException
      */
-    public function getBucketList()
+    public function getBucketList($bucket)
     {
         $method = 'GET';
-        $path = '/your-bucket-list-path'; // 替换为实际的获取存储桶列表的 API 路径
+        $path = "/$bucket"; // 替换为实际的获取存储桶列表的 API 路径
         return $this->makeRequest($method, $path);
     }
 
@@ -139,12 +139,23 @@ class FSSClient
         $options = [
             'body' => fopen($localFile, 'r'),
             'headers' => [
-                'Content-Type' => 'application/octet-stream',
                 'Content-Length' => filesize($localFile),
                 'x-west-automkdir' => "true",
             ]
         ];
         
-        return $this->makeRequest($method, $path, $options);
+        $res = $this->makeRequest($method, $path, $options);
+        if ($res['code'] != 200) {
+            throw new FSSRequestException($res['code'], $res['message']);
+        }
+        $res['url'] = $this->getUrl($bucketName, $targetPath);
+        return $res;
+    }
+
+    private function getUrl($bucket, $filePath): string
+    {
+        $info = parse_url($this->endpoint);
+        $filePath = ltrim(urldecode($filePath), "/");
+        return sprintf("%s://%s.%s/%s", $info['scheme'], $bucket, $info['host'], ltrim(urldecode($filePath)));
     }
 }
