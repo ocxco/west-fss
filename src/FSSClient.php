@@ -131,6 +131,8 @@ class FSSClient
     public function uploadFile(string $bucketName, string $targetPath, string $localFile, array $options = []): array
     {
         $method = 'PUT';
+        // 处理特殊符号，不然上传之后访问不了
+        $targetPath = str_replace(["（", "）"], ["(", ")"], $targetPath);
         $targetPath = urlencode("/$targetPath");
         $path = "/$bucketName$targetPath";
         if (!file_exists($localFile)) {
