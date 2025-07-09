@@ -4,6 +4,7 @@ namespace Chasel\WestFss;
 
 use Chasel\WestFss\Exceptions\FSSRequestException;
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 
 class FSSClient
@@ -72,7 +73,7 @@ class FSSClient
      * @param string $path 请求路径
      * @param array $options 请求选项
      * @return array 响应数据
-     * @throws FSSRequestException|\GuzzleHttp\Exception\GuzzleException
+     * @throws FSSRequestException|GuzzleException
      */
     private function makeRequest(string $method, string $path, array $options = [])
     {
@@ -107,9 +108,9 @@ class FSSClient
      * 根据文档 https://www.west.cn/paas/doc/fss/restapi.html 替换实际请求逻辑
      *
      * @return array 存储桶列表数据
-     * @throws FSSRequestException
+     * @throws FSSRequestException|GuzzleException
      */
-    public function getBucketList($bucket)
+    public function getBucketList($bucket): array
     {
         $method = 'GET';
         $path = "/$bucket"; // 替换为实际的获取存储桶列表的 API 路径
@@ -122,28 +123,28 @@ class FSSClient
      * @param string $bucketName 存储桶名称
      * @param string $targetPath 目标路径
      * @param string $localFile
+     * @param array $options
      * @return array 响应数据
      * @throws FSSRequestException
+     * @throws GuzzleException
      */
-    public function uploadFile(string $bucketName, string $targetPath, string $localFile)
+    public function uploadFile(string $bucketName, string $targetPath, string $localFile, array $options = []): array
     {
         $method = 'PUT';
         $targetPath = urlencode("/$targetPath");
         $path = "/$bucketName$targetPath";
-
-        
         if (!file_exists($localFile)) {
             throw new FSSRequestException(0, "文件不存在: {$localFile}");
         }
         
         $options = [
             'body' => fopen($localFile, 'r'),
-            'headers' => [
+            'headers' => array_merge([
                 'Content-Length' => filesize($localFile),
                 'x-west-automkdir' => "true",
-            ]
+            ], $options)
         ];
-        
+
         $res = $this->makeRequest($method, $path, $options);
         if ($res['code'] != 200) {
             throw new FSSRequestException($res['code'], $res['message']);
